@@ -5,15 +5,15 @@ import {
     MintableERC20,
     WETH9,
     IERC20__factory
-} from '../../../types';
-import { FeeAmount, TICK_SPACINGS } from '../../uniswap-v3/periphery/shared/constants';
-import { encodePriceSqrt } from '../../uniswap-v3/periphery/shared/encodePriceSqrt';
-import { expandTo18Decimals } from '../../uniswap-v3/periphery/shared/expandTo18Decimals';
-import { getMaxTick, getMinTick } from '../../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker } from '../shared/brokerFixture';
-import { expect } from '../shared/expect'
-import { initializeMakeSuite, InterestRateMode, AAVEFixture } from '../shared/aaveFixture';
-import { uniswapFixtureNoTokens, UniswapFixtureNoTokens } from '../shared/uniswapFixture';
+} from '../../types';
+import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constants';
+import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
+import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
+import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
+import { brokerFixture, BrokerFixture, initBroker } from './shared/brokerFixture';
+import { expect } from './shared/expect'
+import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
+import { uniswapFixtureNoTokens, UniswapFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
 
 // we prepare a setup for aave in hardhat

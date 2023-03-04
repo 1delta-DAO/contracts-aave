@@ -398,46 +398,44 @@ const config: HardhatUserConfig = {
       },
       {
         version: '0.8.10',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 100000,
+          },
+          evmVersion: 'london',
+        },
       }
     ],
     overrides: {
       "contracts/external-protocols/aave-v3-core/protocol/pool/Pool.sol": {
-        version: "0.8.10",
+        version: '0.8.10',
         settings: {
-          evmVersion: 'london',
           optimizer: {
             enabled: true,
-            runs: 1000,
+            runs: 100000,
           },
-          metadata: {
-            bytecodeHash: 'none',
-          },
+          evmVersion: 'london',
         },
       },
       "contracts/external-protocols/aave-v3-core/protocol/libraries/logic/BorrowLogic.sol": {
-        version: "0.8.10",
+        version: '0.8.10',
         settings: {
-          evmVersion: 'london',
           optimizer: {
             enabled: true,
-            runs: 1000,
+            runs: 100000,
           },
-          metadata: {
-            bytecodeHash: 'none',
-          },
+          evmVersion: 'london',
         },
       },
       "contracts/external-protocols/aave-v3-core/protocol/pool/PoolConfigurator.sol": {
-        version: "0.8.10",
+        version: '0.8.10',
         settings: {
-          evmVersion: 'london',
           optimizer: {
             enabled: true,
-            runs: 1000,
+            runs: 100000,
           },
-          metadata: {
-            bytecodeHash: 'none',
-          },
+          evmVersion: 'london',
         },
       },
       "contracts/external-protocols/compound/Comptroller.sol": {
@@ -464,16 +462,6 @@ const config: HardhatUserConfig = {
           metadata: {
             bytecodeHash: 'none',
           },
-        },
-      },
-      "contracts/external-protocols/aave-v3-core/": {
-        version: "0.8.10",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 100000,
-          },
-          evmVersion: 'london',
         },
       },
       "contracts/external-protocols/compound/test/ComptrollerHarness.sol": {

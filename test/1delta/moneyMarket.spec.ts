@@ -6,17 +6,17 @@ import {
     WETH9,
     IERC20__factory,
     MinimalSwapRouter__factory
-} from '../../../types';
-import { FeeAmount, TICK_SPACINGS } from '../../uniswap-v3/periphery/shared/constants';
-import { encodePriceSqrt } from '../../uniswap-v3/periphery/shared/encodePriceSqrt';
-import { expandTo18Decimals } from '../../uniswap-v3/periphery/shared/expandTo18Decimals';
-import { getMaxTick, getMinTick } from '../../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker } from '../shared/brokerFixture';
-import { expect } from '../shared/expect'
-import { initializeMakeSuite, InterestRateMode, AAVEFixture } from '../shared/aaveFixture';
-import { addLiquidity, uniswapFixtureNoTokens, UniswapFixtureNoTokens, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from '../shared/uniswapFixture';
+} from '../../types';
+import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constants';
+import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
+import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
+import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
+import { brokerFixture, BrokerFixture, initBroker } from './shared/brokerFixture';
+import { expect } from './shared/expect'
+import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
+import { addLiquidity, uniswapFixtureNoTokens, UniswapFixtureNoTokens, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
-import { encodePath } from '../../uniswap-v3/periphery/shared/path';
+import { encodePath } from '../uniswap-v3/periphery/shared/path';
 
 // we prepare a setup for aave in hardhat
 // this series of tests checks that the features used for the margin swap implementation
