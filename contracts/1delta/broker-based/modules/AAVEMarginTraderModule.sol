@@ -27,6 +27,8 @@ import {WithStorage} from "../storage/BrokerStorage.sol";
 import {IUniswapV3Pool} from "../../uniswap/core/IUniswapV3Pool.sol";
 import {CallbackValidation} from "../../uniswap/libraries/CallbackValidation.sol";
 import {PoolAddress} from "../../uniswap/libraries/PoolAddress.sol";
+import {TokenTransfer} from "../libraries/TokenTransfer.sol";
+
 
 // solhint-disable max-line-length
 
@@ -35,7 +37,7 @@ import {PoolAddress} from "../../uniswap/libraries/PoolAddress.sol";
  * @notice Allows users to build large margin positions with one contract interaction
  * @author Achthar
  */
-contract AAVEMarginTraderModule is WithStorage {
+contract AAVEMarginTraderModule is WithStorage, TokenTransfer {
     using Path for bytes;
     using SafeCast for uint256;
 
@@ -63,15 +65,13 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = _uniswapV3params.tokenIn < _uniswapV3params.tokenOut;
 
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_uniswapV3params.tokenIn, _uniswapV3params.tokenOut, _uniswapV3params.fee).swap(
             address(this),
             zeroForOne,
             _uniswapV3params.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -90,15 +90,13 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
 
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             _uniswapV3params.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -115,21 +113,19 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = _uniswapV3params.tokenIn < _uniswapV3params.tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_uniswapV3params.tokenIn, _uniswapV3params.tokenOut, _uniswapV3params.fee).swap(
             address(this),
             zeroForOne,
             -_uniswapV3params.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _uniswapV3params.amountOut);
+        require(amountOutReceived == _uniswapV3params.amountOut);
     }
 
     // swaps the loan from one token (tokenIn) to another (tokenOut) provided tokenOut amount
@@ -145,15 +141,13 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: _uniswapV3params.amountInMaximum
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
 
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             -_uniswapV3params.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -171,15 +165,13 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = _uniswapV3params.tokenIn < _uniswapV3params.tokenOut;
 
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_uniswapV3params.tokenIn, _uniswapV3params.tokenOut, _uniswapV3params.fee).swap(
             address(this),
             zeroForOne,
             _uniswapV3params.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -198,15 +190,13 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
 
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             _uniswapV3params.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -224,21 +214,19 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = _uniswapV3params.tokenIn < _uniswapV3params.tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_uniswapV3params.tokenIn, _uniswapV3params.tokenOut, _uniswapV3params.fee).swap(
             address(this),
             zeroForOne,
             -_uniswapV3params.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _uniswapV3params.amountOut);
+        require(amountOutReceived == _uniswapV3params.amountOut);
     }
 
     // swaps the collateral from one token (tokenIn) to another (tokenOut) provided tokenOut amount
@@ -254,15 +242,13 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: _uniswapV3params.amountInMaximum
         });
 
-        uint160 sqrtPriceLimitX96 = _uniswapV3params.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
 
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             -_uniswapV3params.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -272,7 +258,7 @@ contract AAVEMarginTraderModule is WithStorage {
     // increase the margin position - borrow (tokenIn) and sell it against collateral (tokenOut)
     // the user provides the debt amount as input
     function openMarginPositionExactIn(MarginSwapParamsExactIn memory _marginSwapParams) external payable returns (uint256) {
-        TransferHelper.safeTransferFrom(_marginSwapParams.tokenOut, msg.sender, address(this), _marginSwapParams.userAmountProvided);
+        _transferERC20TokensFrom(_marginSwapParams.tokenOut, msg.sender, address(this), _marginSwapParams.userAmountProvided);
 
         MarginCallbackData memory data = MarginCallbackData({
             path: abi.encodePacked(_marginSwapParams.tokenIn, _marginSwapParams.fee, _marginSwapParams.tokenOut),
@@ -283,14 +269,12 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = _marginSwapParams.tokenIn < _marginSwapParams.tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_marginSwapParams.tokenIn, _marginSwapParams.tokenOut, _marginSwapParams.fee).swap(
             address(this),
             zeroForOne,
             _marginSwapParams.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -300,7 +284,7 @@ contract AAVEMarginTraderModule is WithStorage {
     // increase the margin position - borrow (tokenIn) and sell it against collateral (tokenOut)
     // the user provides the collateral amount as input
     function openMarginPositionExactOut(MarginSwapParamsExactOut memory _marginSwapParams) external payable returns (uint256 amountIn) {
-        TransferHelper.safeTransferFrom(_marginSwapParams.tokenOut, msg.sender, address(this), _marginSwapParams.userAmountProvided);
+        _transferERC20TokensFrom(_marginSwapParams.tokenOut, msg.sender, address(this), _marginSwapParams.userAmountProvided);
 
         MarginCallbackData memory data = MarginCallbackData({
             path: abi.encodePacked(_marginSwapParams.tokenIn, _marginSwapParams.fee, _marginSwapParams.tokenOut),
@@ -311,21 +295,19 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = _marginSwapParams.tokenIn < _marginSwapParams.tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_marginSwapParams.tokenIn, _marginSwapParams.tokenOut, _marginSwapParams.fee).swap(
             address(this),
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
     }
 
     // decrease the margin position - use the collateral (tokenIn) to pay back a borrow (tokenOut)
@@ -339,14 +321,12 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = _marginSwapParams.tokenIn < _marginSwapParams.tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_marginSwapParams.tokenIn, _marginSwapParams.tokenOut, _marginSwapParams.fee).swap(
             address(this),
             zeroForOne,
             _marginSwapParams.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -363,21 +343,19 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = _marginSwapParams.tokenIn < _marginSwapParams.tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(_marginSwapParams.tokenIn, _marginSwapParams.tokenOut, _marginSwapParams.fee).swap(
             address(this),
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
     }
 
 
@@ -397,14 +375,12 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             _marginSwapParams.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -428,21 +404,19 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: type(uint256).max
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
     }
 
     // decrease the margin position - use the collateral (tokenIn) to pay back a borrow (tokenOut)
@@ -458,14 +432,12 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: 0
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             _marginSwapParams.amountIn.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
 
@@ -484,20 +456,18 @@ contract AAVEMarginTraderModule is WithStorage {
             amount: type(uint256).max
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO ,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
     }
 }

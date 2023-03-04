@@ -4,17 +4,13 @@ import { ethers } from 'hardhat'
 import {
     MintableERC20,
     WETH9,
-    IERC20__factory,
-    MinimalSwapRouter__factory
 } from '../../types';
-import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constants';
-import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
-import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
-import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker } from './shared/brokerFixture';
+import { FeeAmount } from '../uniswap-v3/periphery/shared/constants';
+import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals'
+import { initNewBroker, newBrokerFixture, NewBrokerFixture } from './shared/brokerFixture';
 import { expect } from './shared/expect'
 import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
-import { addLiquidity, uniswapFixtureNoTokens, UniswapFixtureNoTokens, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
+import { addLiquidity, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
 import { encodePath } from '../uniswap-v3/periphery/shared/path';
 
@@ -34,7 +30,7 @@ describe('AAVE Money Market operations', async () => {
     let xander: SignerWithAddress;
     let uniswap: UniswapMinimalFixtureNoTokens;
     let aaveTest: AAVEFixture;
-    let broker: BrokerFixture;
+    let broker: NewBrokerFixture;
     let tokens: (MintableERC20 | WETH9)[];
 
     before('Deploy Account, Trader, Uniswap and AAVE', async () => {
@@ -46,9 +42,9 @@ describe('AAVE Money Market operations', async () => {
         tokens = Object.values(aaveTest.tokens)
         uniswap = await uniswapMinimalFixtureNoTokens(deployer, aaveTest.tokens["WETH"].address)
 
-        broker = await brokerFixture(deployer)
+        broker = await newBrokerFixture(deployer)
 
-        await initBroker(deployer, broker, uniswap, aaveTest)
+        await initNewBroker(deployer, broker, uniswap, aaveTest)
 
         await broker.manager.setUniswapRouter(uniswap.router.address)
         // approve & fund wallets

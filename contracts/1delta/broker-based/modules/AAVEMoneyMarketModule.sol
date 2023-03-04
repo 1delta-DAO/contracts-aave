@@ -4,12 +4,7 @@ pragma solidity ^0.8.18;
 
 import {
     MarginSwapTradeType, 
-    MarginCallbackData, 
-    ExactInputSingleParamsBase,
-    MarginSwapParamsExactIn, 
-    ExactOutputSingleParamsBase, 
-    MarginSwapParamsExactOut, 
-    MarginSwapParamsMultiExactIn,
+    MarginCallbackData,
     MarginSwapParamsMultiExactOut
     } from "../dataTypes/InputTypes.sol";
 import "../../../external-protocols/uniswapV3/periphery/additionalInterfaces/IMinimalSwapRouter.sol";
@@ -79,21 +74,19 @@ contract AAVEMoneyMarketModule is WithStorage {
             amount: amountInMaximum
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
 
         // deposit received amount to aave on behalf of user
         IPool(aas().v3Pool).supply(tokenOut, amountOutReceived, msg.sender, 0);
@@ -122,21 +115,19 @@ contract AAVEMoneyMarketModule is WithStorage {
             amount: type(uint256).max
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             msg.sender,
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
     }
 
     function borrowAndSwapExactIn(uint256 interestRateMode, ExactInputParams memory uniswapParams) external returns (uint256 amountOut) {
@@ -157,21 +148,19 @@ contract AAVEMoneyMarketModule is WithStorage {
             amount: type(uint256).max
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             msg.sender,
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO,
             abi.encode(data)
         );
         uint256 amountOutReceived;
         (amountIn, amountOutReceived) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountOutReceived == _marginSwapParams.amountOut);
+        require(amountOutReceived == _marginSwapParams.amountOut);
     }
 
     function swapAndRepayExactIn(uint256 interestRateMode, MinimalExactInputMultiParams calldata uniswapParams) external returns (uint256 amountOut) {
@@ -193,21 +182,19 @@ contract AAVEMoneyMarketModule is WithStorage {
             amount: type(uint256).max
         });
 
-        uint160 sqrtPriceLimitX96 = _marginSwapParams.sqrtPriceLimitX96;
-
         bool zeroForOne = tokenIn < tokenOut;
         (int256 amount0, int256 amount1) = getUniswapV3Pool(tokenIn, tokenOut, fee).swap(
             address(this),
             zeroForOne,
             -_marginSwapParams.amountOut.toInt256(),
-            sqrtPriceLimitX96 == 0 ? (zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO) : sqrtPriceLimitX96,
+            zeroForOne ? MIN_SQRT_RATIO : MAX_SQRT_RATIO,
             abi.encode(data)
         );
         uint256 amountToRepay;
         (amountIn, amountToRepay) = zeroForOne ? (uint256(amount0), uint256(-amount1)) : (uint256(amount1), uint256(-amount0));
         // it's technically possible to not receive the full output amount,
         // so if no price limit has been specified, require this possibility away
-        if (sqrtPriceLimitX96 == 0) require(amountToRepay == _marginSwapParams.amountOut);
+        require(amountToRepay == _marginSwapParams.amountOut);
 
         // deposit received amount to aave on behalf of user
         amountToRepay = IPool(aas().v3Pool).repay(tokenOut, amountToRepay, _marginSwapParams.interestRateMode, msg.sender);

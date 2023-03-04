@@ -10,7 +10,7 @@ import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constan
 import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
 import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
 import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker } from './shared/brokerFixture';
+import { initNewBroker, newBrokerFixture, NewBrokerFixture } from './shared/brokerFixture';
 import { expect } from './shared/expect'
 import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
 import { uniswapFixtureNoTokens, UniswapFixtureNoTokens } from './shared/uniswapFixture';
@@ -27,7 +27,8 @@ describe('AAVE Brokered Loan Swap operations', async () => {
     let gabi: SignerWithAddress;
     let uniswap: UniswapFixtureNoTokens;
     let aaveTest: AAVEFixture;
-    let broker: BrokerFixture;
+    let broker: NewBrokerFixture
+        ;
     let tokens: (MintableERC20 | WETH9)[];
 
     async function addLiquidity(signer: SignerWithAddress, tokenAddressA: string, tokenAddressB: string, amountA: BigNumber, amountB: BigNumber) {
@@ -76,9 +77,9 @@ describe('AAVE Brokered Loan Swap operations', async () => {
         tokens = Object.values(aaveTest.tokens)
         uniswap = await uniswapFixtureNoTokens(deployer, aaveTest.tokens["WETH"].address)
 
-        broker = await brokerFixture(deployer)
+        broker = await newBrokerFixture(deployer)
 
-        await initBroker(deployer, broker, uniswap, aaveTest)
+        await initNewBroker(deployer, broker, uniswap, aaveTest)
 
         // approve & fund wallets
         let keys = Object.keys(aaveTest.tokens)

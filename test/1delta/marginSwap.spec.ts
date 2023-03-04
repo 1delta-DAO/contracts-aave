@@ -10,10 +10,10 @@ import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constan
 import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
 import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
 import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker, ONE_18 } from './shared/brokerFixture';
+import { initNewBroker, newBrokerFixture, NewBrokerFixture, ONE_18 } from './shared/brokerFixture';
 import { expect } from './shared/expect'
 import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
-import { uniswapFixtureNoTokens, UniswapFixtureNoTokens, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
+import { uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
 
 // we prepare a setup for aave in hardhat
@@ -28,7 +28,7 @@ describe('AAVE Brokered Margin Swap operations', async () => {
     let test: SignerWithAddress;
     let uniswap: UniswapMinimalFixtureNoTokens;
     let aaveTest: AAVEFixture;
-    let broker: BrokerFixture;
+    let broker: NewBrokerFixture;
     let tokens: (MintableERC20 | WETH9)[];
 
     async function addLiquidity(signer: SignerWithAddress, tokenAddressA: string, tokenAddressB: string, amountA: BigNumber, amountB: BigNumber) {
@@ -74,9 +74,9 @@ describe('AAVE Brokered Margin Swap operations', async () => {
         aaveTest = await initializeMakeSuite(deployer)
         tokens = Object.values(aaveTest.tokens)
         uniswap = await uniswapMinimalFixtureNoTokens(deployer, aaveTest.tokens["WETH"].address)
-        broker = await brokerFixture(deployer)
+        broker = await newBrokerFixture(deployer)
 
-        await initBroker(deployer, broker, uniswap, aaveTest)
+        await initNewBroker(deployer, broker, uniswap, aaveTest)
 
         // approve & fund wallets
         let keys = Object.keys(aaveTest.tokens)

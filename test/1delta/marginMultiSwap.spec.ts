@@ -3,19 +3,14 @@ import { BigNumber, constants } from 'ethers';
 import { ethers } from 'hardhat'
 import {
     MintableERC20,
-    WETH9,
-    IERC20__factory,
-    PathTesterBroker,
-    PathTesterBroker__factory
+    WETH9
 } from '../../types';
-import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constants';
-import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
+import { FeeAmount } from '../uniswap-v3/periphery/shared/constants';
 import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
-import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker, ONE_18 } from './shared/brokerFixture';
+import {  initNewBroker, newBrokerFixture, NewBrokerFixture, ONE_18 } from './shared/brokerFixture';
 import { expect } from './shared/expect'
 import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
-import { addLiquidity, uniswapFixtureNoTokens, UniswapFixtureNoTokens, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
+import { addLiquidity, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
 import { encodePath } from '../uniswap-v3/periphery/shared/path';
 
@@ -31,7 +26,7 @@ describe('AAVE Brokered Margin Multi Swap operations', async () => {
     let test: SignerWithAddress;
     let uniswap: UniswapMinimalFixtureNoTokens;
     let aaveTest: AAVEFixture;
-    let broker: BrokerFixture;
+    let broker: NewBrokerFixture;
     let tokens: (MintableERC20 | WETH9)[];
 
     before('Deploy Account, Trader, Uniswap and AAVE', async () => {
@@ -42,9 +37,9 @@ describe('AAVE Brokered Margin Multi Swap operations', async () => {
         aaveTest = await initializeMakeSuite(deployer)
         tokens = Object.values(aaveTest.tokens)
         uniswap = await uniswapMinimalFixtureNoTokens(deployer, aaveTest.tokens["WETH"].address)
-        broker = await brokerFixture(deployer)
+        broker = await newBrokerFixture(deployer)
 
-        await initBroker(deployer, broker, uniswap, aaveTest)
+        await initNewBroker(deployer, broker, uniswap, aaveTest)
         await broker.manager.setUniswapRouter(uniswap.router.address)
         // approve & fund wallets
         let keys = Object.keys(aaveTest.tokens)
@@ -342,3 +337,20 @@ describe('AAVE Brokered Margin Multi Swap operations', async () => {
     })
 
 })
+
+// ·----------------------------------------------------------------------------------------------|---------------------------|-----------------|-----------------------------·
+// |                                     Solc version: 0.8.18                                     ·  Optimizer enabled: true  ·  Runs: 1000000  ·  Block limit: 30000000 gas  │
+// ·······························································································|···························|·················|······························
+// |  Methods                                                                                                                                                                 │
+// ························································|······································|·············|·············|·················|···············|··············
+// |  Contract                                             ·  Method                              ·  Min        ·  Max        ·  Avg            ·  # calls      ·  usd (avg)  │
+// ························································|······································|·············|·············|·················|···············|··············
+// ························································|······································|·············|·············|·················|···············|··············
+// |  AAVEMarginTraderModule                               ·  openMarginPositionExactInMulti      ·          -  ·          -  ·         596814  ·            1  ·          -  │
+// ························································|······································|·············|·············|·················|···············|··············
+// |  AAVEMarginTraderModule                               ·  openMarginPositionExactOutMulti     ·          -  ·          -  ·         502118  ·            1  ·          -  │
+// ························································|······································|·············|·············|·················|···············|··············
+// |  AAVEMarginTraderModule                               ·  trimMarginPositionExactInMulti      ·          -  ·          -  ·         564854  ·            1  ·          -  │
+// ························································|······································|·············|·············|·················|···············|··············
+// |  AAVEMarginTraderModule                               ·  trimMarginPositionExactOutMulti     ·          -  ·          -  ·         489168  ·            1  ·          -  │
+// ························································|······································|·············|·············|·················|···············|··············

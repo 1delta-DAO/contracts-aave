@@ -4,18 +4,15 @@ import { ethers } from 'hardhat'
 import {
     MintableERC20,
     WETH9,
-    IERC20__factory,
     PathTesterBroker,
     PathTesterBroker__factory
 } from '../../types';
-import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constants';
-import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
+import { FeeAmount } from '../uniswap-v3/periphery/shared/constants';
 import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
-import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker } from './shared/brokerFixture';
+import { initNewBroker, NewBrokerFixture, newBrokerFixture } from './shared/brokerFixture';
 import { expect } from './shared/expect'
 import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
-import { addLiquidity, uniswapFixtureNoTokens, UniswapFixtureNoTokens, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
+import { addLiquidity, uniswapMinimalFixtureNoTokens, UniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
 import { encodePath } from '../uniswap-v3/periphery/shared/path';
 
@@ -31,7 +28,7 @@ describe('AAVE Brokered Loan Multi Swap operations', async () => {
     let test: SignerWithAddress;
     let uniswap: UniswapMinimalFixtureNoTokens;
     let aaveTest: AAVEFixture;
-    let broker: BrokerFixture;
+    let broker: NewBrokerFixture;
     let tokens: (MintableERC20 | WETH9)[];
     let pathTester: PathTesterBroker
 
@@ -43,10 +40,10 @@ describe('AAVE Brokered Loan Multi Swap operations', async () => {
         aaveTest = await initializeMakeSuite(deployer)
         tokens = Object.values(aaveTest.tokens)
         uniswap = await uniswapMinimalFixtureNoTokens(deployer, aaveTest.tokens["WETH"].address)
-        broker = await brokerFixture(deployer)
+        broker = await newBrokerFixture(deployer)
 
         pathTester = await new PathTesterBroker__factory(deployer).deploy()
-        await initBroker(deployer, broker, uniswap, aaveTest)
+        await initNewBroker(deployer, broker, uniswap, aaveTest)
         await broker.manager.setUniswapRouter(uniswap.router.address)
         // approve & fund wallets
         let keys = Object.keys(aaveTest.tokens)
@@ -274,53 +271,6 @@ describe('AAVE Brokered Loan Multi Swap operations', async () => {
         expect(Number(formatEther(ctIn))).to.greaterThanOrEqual(Number(formatEther(expandTo18Decimals(145))))
         expect(Number(formatEther(ctIn))).to.lessThanOrEqual(Number(formatEther(expandTo18Decimals(145))) * 1.000001)
         expect(Number(formatEther(ctInOther))).to.greaterThanOrEqual(Number(formatEther(expandTo18Decimals(5))))
-    })
-
-    // skip that one as oracle config has to be researched in case of deviating decimals
-    it.skip('allows loan swap exact in different decimals', async () => {
-
-        // const supplyTokenIndex = "DAI"
-        // const supplyTokenIndexOther = "AAVE"
-        // const borrowTokenIndex = "WETH"
-        // const providedAmount = expandTo18Decimals(500)
-
-
-        // const swapAmount = BigNumber.from(950e6)
-
-        // console.log("transfer")
-        // await aaveTest.tokens[supplyTokenIndex].connect(deployer).transfer(alice.address, expandTo18Decimals(1_000))
-        // await aaveTest.tokens[borrowTokenIndex].connect(deployer).transfer(alice.address, expandTo18Decimals(1_000))
-
-        // const params = {
-        //     tokenIn: aaveTest.tokens[borrowTokenIndex].address,
-        //     tokenOut: aaveTest.tokens[supplyTokenIndex].address,
-        //     fee: FeeAmount.MEDIUM,
-        //     userAmountProvided: providedAmount,
-        //     interestRateModeIn: InterestRateMode.VARIABLE,
-        //     interestRateModeOut: InterestRateMode.VARIABLE,
-        //     amountIn: swapAmount,
-        //     sqrtPriceLimitX96: '0'
-        // }
-
-        // await aaveTest.tokens[borrowTokenIndex].connect(alice).approve(broker.broker.address, constants.MaxUint256)
-        // await aaveTest.tokens[supplyTokenIndex].connect(alice).approve(broker.broker.address, constants.MaxUint256)
-
-        // await aaveTest.vTokens[borrowTokenIndex].connect(alice).approveDelegation(broker.broker.address, constants.MaxUint256)
-        // await aaveTest.vTokens[supplyTokenIndex].connect(alice).approveDelegation(broker.broker.address, constants.MaxUint256)
-
-        // await aaveTest.sTokens[borrowTokenIndex].connect(alice).approveDelegation(broker.broker.address, constants.MaxUint256)
-        // await aaveTest.sTokens[supplyTokenIndex].connect(alice).approveDelegation(broker.broker.address, constants.MaxUint256)
-
-        // await aaveTest.tokens[supplyTokenIndex].connect(alice).approve(aaveTest.pool.address, constants.MaxUint256)
-        // await aaveTest.pool.connect(alice).supply(aaveTest.tokens[supplyTokenIndex].address, ONE_18, alice.address, 0)
-        // await aaveTest.pool.connect(alice).setUserUseReserveAsCollateral(aaveTest.tokens[supplyTokenIndex].address, true)
-
-        // // open margin position
-        // await broker.broker.connect(alice).openMarginPositionExactIn(params)
-
-        // const bb = await aaveTest.pool.getUserAccountData(alice.address)
-        // // note that usdc has 6 decimals and the oracle prices in 18 decimals
-        // expect(bb.totalDebtBase.toString()).to.equal(swapAmount.mul(BigNumber.from(10).pow(12)).toString())
     })
 
     it('allows loan swap multi exact out', async () => {

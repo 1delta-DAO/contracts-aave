@@ -43,7 +43,6 @@ struct ExactInputSingleParamsBase {
     uint24 fee;
     uint256 amountIn;
     uint256 amountOutMinimum;
-    uint160 sqrtPriceLimitX96;
     uint256 interestRateMode;
 }
 
@@ -51,7 +50,6 @@ struct ExactInputMultiParams {
     bytes path;
     uint256 amountIn;
     uint256 amountOutMinimum;
-    uint160 sqrtPriceLimitX96;
     uint256 interestRateMode;
 }
 
@@ -62,7 +60,6 @@ struct MarginSwapParamsExactIn {
     uint24 fee;
     uint256 userAmountProvided;
     uint256 amountIn;
-    uint160 sqrtPriceLimitX96;
 }
 
 struct ExactOutputSingleParamsBase {
@@ -71,7 +68,6 @@ struct ExactOutputSingleParamsBase {
     uint24 fee;
     uint256 amountOut;
     uint256 amountInMaximum;
-    uint160 sqrtPriceLimitX96;
     uint256 interestRateMode;
 }
 
@@ -79,7 +75,6 @@ struct ExactOutputMultiParams {
     bytes path;
     uint256 amountOut;
     uint256 amountInMaximum;
-    uint160 sqrtPriceLimitX96;
     uint256 interestRateMode;
 }
 
@@ -89,7 +84,6 @@ struct MarginSwapParamsExactOut {
     uint24 fee;
     uint256 userAmountProvided;
     uint256 amountOut;
-    uint160 sqrtPriceLimitX96;
     uint256 interestRateMode;
 }
 
@@ -98,7 +92,6 @@ struct MarginSwapParamsMultiExactIn {
     uint256 interestRateMode;
     uint256 userAmountProvided;
     uint256 amountIn;
-    uint160 sqrtPriceLimitX96;
 }
 
 struct MarginSwapParamsMultiExactOut {
@@ -106,7 +99,6 @@ struct MarginSwapParamsMultiExactOut {
     uint256 interestRateMode;
     uint256 userAmountProvided;
     uint256 amountOut;
-    uint160 sqrtPriceLimitX96;
 }
 
 struct ExactOutputUniswapParams {

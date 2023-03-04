@@ -27,8 +27,8 @@ import {
   PoolConfigurator__factory,
   PoolLogic__factory,
   Pool__factory,
-  PriceOracleMock,
-  PriceOracleMock__factory,
+  PriceOracle,
+  PriceOracle__factory,
   PriceOracleSentinel__factory,
   SequencerOracle__factory,
   StableDebtToken,
@@ -52,7 +52,7 @@ export interface AAVEFixture {
   users: SignerWithAddress[];
   pool: Pool;
   configurator: PoolConfigurator;
-  oracle: PriceOracleMock;
+  oracle: PriceOracle;
   aaveOracle: AaveOracle;
   helpersContract: AaveProtocolDataProvider;
   weth: WETH9Mocked;
@@ -83,7 +83,7 @@ const testEnv: AAVEFixture = {
   pool: {} as Pool,
   configurator: {} as PoolConfigurator,
   helpersContract: {} as AaveProtocolDataProvider,
-  oracle: {} as PriceOracleMock,
+  oracle: {} as PriceOracle,
   aaveOracle: {} as AaveOracle,
   weth: {} as WETH9Mocked,
   aWETH: {} as AToken,
@@ -195,7 +195,7 @@ export async function initializeMakeSuite(_deployer: SignerWithAddress, scenario
   testEnv.aclManager = await new ACLManager__factory(_deployer).deploy(testEnv.addressesProvider.address) //await getACLManager();
 
   // set up oracles
-  testEnv.oracle = await new PriceOracleMock__factory(_deployer).deploy() // getFallbackOracle();
+  testEnv.oracle = await new PriceOracle__factory(_deployer).deploy() // getFallbackOracle();
   const sequencer = await new SequencerOracle__factory(_deployer).deploy(_deployer.address)
   const sentinel = await new PriceOracleSentinel__factory(_deployer).deploy(testEnv.addressesProvider.address, sequencer.address, 1)
 

@@ -4,18 +4,15 @@ import { ethers } from 'hardhat'
 import {
     MintableERC20,
     WETH9,
-    IERC20__factory,
     PathTesterBroker__factory,
     PathTesterBroker
 } from '../../types';
-import { FeeAmount, TICK_SPACINGS } from '../uniswap-v3/periphery/shared/constants';
-import { encodePriceSqrt } from '../uniswap-v3/periphery/shared/encodePriceSqrt';
+import { FeeAmount } from '../uniswap-v3/periphery/shared/constants';
 import { expandTo18Decimals } from '../uniswap-v3/periphery/shared/expandTo18Decimals';
-import { getMaxTick, getMinTick } from '../uniswap-v3/periphery/shared/ticks';
-import { brokerFixture, BrokerFixture, initBroker } from './shared/brokerFixture';
+import { initNewBroker, NewBrokerFixture, newBrokerFixture } from './shared/brokerFixture';
 import { expect } from './shared/expect'
 import { initializeMakeSuite, InterestRateMode, AAVEFixture } from './shared/aaveFixture';
-import { addLiquidity, uniswapFixtureNoTokens, UniswapFixtureNoTokens, UniswapMinimalFixtureNoTokens, uniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
+import { addLiquidity, UniswapMinimalFixtureNoTokens, uniswapMinimalFixtureNoTokens } from './shared/uniswapFixture';
 import { formatEther } from 'ethers/lib/utils';
 import { encodePath } from '../uniswap-v3/periphery/shared/path';
 
@@ -31,22 +28,19 @@ describe('AAVE Brokered Collateral Multi Swap operations', async () => {
     let test: SignerWithAddress;
     let uniswap: UniswapMinimalFixtureNoTokens;
     let aaveTest: AAVEFixture;
-    let broker: BrokerFixture;
+    let broker: NewBrokerFixture;
     let tokens: (MintableERC20 | WETH9)[];
     let pathTester: PathTesterBroker
 
     before('Deploy Account, Trader, Uniswap and AAVE', async () => {
         [deployer, alice, bob, carol, gabi, test] = await ethers.getSigners();
-
-
-
         aaveTest = await initializeMakeSuite(deployer)
         tokens = Object.values(aaveTest.tokens)
         uniswap = await uniswapMinimalFixtureNoTokens(deployer, aaveTest.tokens["WETH"].address)
-        broker = await brokerFixture(deployer)
+        broker = await newBrokerFixture(deployer)
 
         pathTester = await new PathTesterBroker__factory(deployer).deploy()
-        await initBroker(deployer, broker, uniswap, aaveTest)
+        await initNewBroker(deployer, broker, uniswap, aaveTest)
         await broker.manager.setUniswapRouter(uniswap.router.address)
         // approve & fund wallets
         let keys = Object.keys(aaveTest.tokens)
@@ -313,3 +307,16 @@ describe('AAVE Brokered Collateral Multi Swap operations', async () => {
     })
 
 })
+
+// ·----------------------------------------------------------------------------------------------|-----------------|-----------------------------·
+// |                                     Solc version: 0.8.18                                     |  Runs: 1000000  ·  Block limit: 30000000 gas  │
+// ·······························································································|·················|······························
+// |  Methods                                                                                     |                                               │
+// ························································|······································|·················|···············|··············
+// |  Contract                                             ·  Method                              |  Avg            ·  # calls      ·  usd (avg)  │
+// ························································|······································|·················|···············|··············
+// ························································|······································|·············|·············|·················|···············|··············
+// |  AAVEMarginTraderModule                               ·  swapCollateralExactInMulti          ·          -  ·          -  ·         592532  ·            1  ·          -  │
+// ························································|······································|·············|·············|·················|···············|··············
+// |  AAVEMarginTraderModule                               ·  swapCollateralExactOutMulti         ·          -  ·          -  ·         499586  ·            1  ·          -  │
+// ························································|······································|·············|·············|·················|···············|··············

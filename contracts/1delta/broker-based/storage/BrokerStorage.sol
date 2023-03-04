@@ -40,7 +40,6 @@ library LibStorage {
     bytes32 constant DATA_PROVIDER_STORAGE = keccak256("broker.storage.dataProvider");
     bytes32 constant MARGIN_SWAP_STORAGE = keccak256("broker.storage.marginSwap");
     bytes32 constant UNISWAP_STORAGE = keccak256("broker.storage.uniswap");
-    bytes32 constant COMPOUND_STORAGE = keccak256("broker.storage.compound");
     bytes32 constant AAVE_STORAGE = keccak256("broker.storage.aave");
     bytes32 constant MANAGEMENT_STORAGE = keccak256("broker.storage.management");
 
@@ -55,13 +54,6 @@ library LibStorage {
         bytes32 position = AAVE_STORAGE;
         assembly {
             aas.slot := position
-        }
-    }
-
-    function compoundStorage() internal pure returns (CompoundStorage storage cs) {
-        bytes32 position = COMPOUND_STORAGE;
-        assembly {
-            cs.slot := position
         }
     }
 
@@ -100,10 +92,6 @@ contract WithStorage {
 
     function us() internal pure returns (UniswapStorage storage) {
         return LibStorage.uniswapStorage();
-    }
-
-    function cs() internal pure returns (CompoundStorage storage) {
-        return LibStorage.compoundStorage();
     }
 
     function ms() internal pure returns (ManagementStorage storage) {
