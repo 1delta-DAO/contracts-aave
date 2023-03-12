@@ -39,8 +39,6 @@ interface IModuleProvider {
     function selectorsToModules(bytes4[] memory selectors) external view returns (address[] memory moduleAddressList);
 
     function moduleExists(address moduleAddress) external view returns (bool);
-
-    function validateModules(address[] memory modules) external view;
 }
 
 interface IModuleConfigurator {

@@ -27,9 +27,9 @@ const aaveAddresses = {
     }
 }
 
-const marginSwapAddresses = {
-    Diamond: {
-        5: '0x41E9a4801D7AE2f032cF37Bf262339Eddd00a06c',
+const brokerAddresses = {
+    BrokerProxy: {
+        5: '0xBA4e9BbEa023AcaE6b9De0322A5b274414e4705C',
         80001: '',
         137: ''
     },
@@ -38,8 +38,8 @@ const marginSwapAddresses = {
         80001: '',
         137: ''
     },
-    LensModule: {
-        5: '0xBD6Aa391858ff37c27464BC06E25D4493F1df124',
+    MarginTradeDataViewerModule: {
+        5: '0x91F2f3f8D43600495cD71A047a9Ef5E89edB0052',
         80001: '',
         137: ''
     },
@@ -49,27 +49,22 @@ const marginSwapAddresses = {
         137: ''
     },
     ManagementModule: {
-        5: '0xd6bFcD2e9AD9A5F338B096Bae6480E0c856D66B1',
+        5: '0xE37b1CcfceB4672CCB7fAE9Ce01820863890C95b',
         80001: '',
         137: ''
     },
-    AAVEMarginTraderModule: {
-        5: '0x3B6e3D60aFa7D1BEAFc8902849f15115ce839b10',
+    MarginTraderModule: {
+        5: '0x2c2A54eac487b6250D55fdb8F50686a2F8c39c9f',
         80001: '',
         137: ''
     },
-    AAVEMoneyMarketModule: {
-        5: '0x8AE1a341C21d6D03bdEe3251B0FCf8f8b9A2D0a2',
-        80001: '',
-        137: ''
-    },
-    MarginTradeDataViewerModule: {
-        5: '0xa001f661C293753F642Cfa807C2Fc98625Be3A17',
+    MoneyMarketModule: {
+        5: '0x2Bb953609E6EB8d40EE2D6D9181e10b09CEd6E37',
         80001: '',
         137: ''
     },
     UniswapV3SwapCallbackModule: {
-        5: '0xC4c383c17b5aE30070DdCf5E44b5c1b1F804C69e',
+        5: '0xB406eDCBa871Ce197f7bC4c70616eACB9b892755',
         80001: '',
         137: ''
     },
@@ -77,7 +72,7 @@ const marginSwapAddresses = {
     minimalRouter: {
         5: '0x247c9795279B7258E5EEf89Ae9cF531DbB4E3b95',
         80001: '0x2c4c27Ec2d61A434Db076f9ec0a91A7c0F5d595c',
-        137: '0x61c7fc1de4e8673752cd986a8d4be08c4cd2b1bb'
+        137: '0x97148db25672d106F5ADD5dE734F0eb0360290a0'
     }
 }
 
@@ -86,5 +81,5 @@ module.exports = {
     uniswapAddresses,
     generalAddresses,
     aaveAddresses,
-    marginSwapAddresses
+    brokerAddresses
 }

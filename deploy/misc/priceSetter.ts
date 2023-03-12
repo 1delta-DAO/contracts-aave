@@ -1,6 +1,4 @@
 import { ethers } from "hardhat";
-import { ModuleConfigAction, getSelectors } from "../../test/diamond/libraries/diamond"
-import { generalAddresses, marginSwapAddresses, uniswapAddresses } from "../00_addresses";
 
 
 function delay(delayInms) {

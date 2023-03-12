@@ -134,7 +134,8 @@ const config: HardhatUserConfig = {
       gasMultiplier: 2,
     },
     goerli: {
-      url: 'https://rpc.ankr.com/eth_goerli', // "https://goerli.blockpi.network/v1/rpc/public", //
+      url: 'https://rpc.ankr.com/eth_goerli',
+      // url: "https://goerli.blockpi.network/v1/rpc/public", //
       // url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts: [pk1],
       chainId: 5,
@@ -182,7 +183,8 @@ const config: HardhatUserConfig = {
       gasMultiplier: 2,
     },
     matic: {
-      url: 'https://rpc-mainnet.maticvigil.com',
+      // url: 'https://rpc-mainnet.maticvigil.com',
+      url: 'https://rpc.ankr.com/polygon',
       accounts: [pk5],
       chainId: 137,
       live: true,

@@ -25,7 +25,7 @@ contract OneDeltaModuleManager is IModuleProvider {
     // Used to implement ERC-165.
     mapping(bytes4 => bool) public supportedInterfaces;
     // Used to query if a module exits
-    mapping(address => bool) private _moduleExists;
+    mapping(address => bool) internal _moduleExists;
     // owner of the contract
     address public contractOwner;
 
@@ -35,17 +35,6 @@ contract OneDeltaModuleManager is IModuleProvider {
 
     function moduleExists(address moduleAddress) external view returns (bool) {
         return _moduleExists[moduleAddress];
-    }
-
-    // checks if the module addresses provided are valid
-    function validateModules(address[] memory modules) external view {
-        uint256 length = modules.length;
-        for (uint256 i; i < length; ) {
-            require(_moduleExists[modules[i]], "OneDeltaModuleManager: Invalid module");
-            unchecked {
-                ++i;
-            }
-        }
     }
 
     function selectorToModuleAndPosition(bytes4 selector) external view returns (ModuleAddressAndPosition memory) {

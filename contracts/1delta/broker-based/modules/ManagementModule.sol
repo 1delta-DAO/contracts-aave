@@ -5,7 +5,6 @@ pragma solidity ^0.8.18;
 import {IERC20} from "../../../interfaces/IERC20.sol";
 import {WithStorage} from "../storage/BrokerStorage.sol";
 
-
 // solhint-disable max-line-length
 
 /**
@@ -14,7 +13,6 @@ import {WithStorage} from "../storage/BrokerStorage.sol";
  * @author Achthar
  */
 contract ManagementModule is WithStorage {
-
     modifier onlyManagement() {
         require(ms().isManager[msg.sender], "Only management can interact.");
         _;
@@ -30,6 +28,18 @@ contract ManagementModule is WithStorage {
 
     function addVToken(address _underlying, address _vToken) external onlyManagement {
         aas().vTokens[_underlying] = _vToken;
+    }
+
+    function addAaveTokens(
+        address _underlying,
+        address _aToken,
+        address _vToken,
+        address _sToken
+    ) external onlyManagement {
+        aas().vTokens[_underlying] = _vToken;
+        aas().sTokens[_underlying] = _sToken;
+        aas().vTokens[_underlying] = _vToken;
+        aas().aTokens[_underlying] = _aToken;
     }
 
     function approveAAVEPool(address[] memory assets) external onlyManagement {

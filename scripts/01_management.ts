@@ -1,15 +1,9 @@
 
 import { ethers } from "hardhat";
 import { ManagementModule__factory } from "../types";
-// import {ModuleConfigAction} from "../test/diamond/libraries/diamond"
-
-function delay(delayInms:number) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(2);
-        }, delayInms);
-    });
-}
+import { brokerAddresses } from "../deploy/00_addresses"
+import { validateAddresses } from "../utils/types";
+import { parseUnits } from "ethers/lib/utils";
 
 export enum SupportedAssets {
     WETH = 'WETH',
@@ -31,82 +25,101 @@ export enum SupportedAssets {
 }
 
 const addressesAaveTokensGoerli: { [key: string]: { [chainId: number]: string } } = {
-    [SupportedAssets.WETH]: { 5: '0x2e3A2fb8473316A02b8A297B982498E661E1f6f5' },
-    [SupportedAssets.DAI]: { 5: '0xDF1742fE5b0bFc12331D8EAec6b478DfDbD31464' },
-    [SupportedAssets.LINK]: { 5: '0x07C725d58437504CA5f814AE406e70E21C5e8e9e' },
-    [SupportedAssets.USDC]: { 5: '0xA2025B15a1757311bfD68cb14eaeFCc237AF5b43' },
-    [SupportedAssets.WBTC]: { 5: '0x8869DFd060c682675c2A8aE5B21F2cF738A0E3CE' },
-    [SupportedAssets.USDT]: { 5: '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49' },
-    [SupportedAssets.AAVE]: { 5: '0x63242B9Bd3C22f18706d5c4E627B4735973f1f07' },
-    [SupportedAssets.EURS]: { 5: '0xaA63E0C86b531E2eDFE9F91F6436dF20C301963D' },
+    [SupportedAssets.WETH]: { 5: '0xCCB14936C2E000ED8393A571D15A2672537838Ad' },
+    [SupportedAssets.DAI]: { 5: '0xBa8DCeD3512925e52FE67b1b5329187589072A55' },
+    [SupportedAssets.LINK]: { 5: '0xe9c4393a23246293a8D31BF7ab68c17d4CF90A29' },
+    [SupportedAssets.USDC]: { 5: '0x65aFADD39029741B3b8f0756952C74678c9cEC93' },
+    [SupportedAssets.WBTC]: { 5: '0x45AC379F019E48ca5dAC02E54F406F99F5088099' },
+    [SupportedAssets.USDT]: { 5: '0x2E8D98fd126a32362F2Bd8aA427E59a1ec63F780' },
+    [SupportedAssets.AAVE]: { 5: '0x8153A21dFeB1F67024aA6C6e611432900FF3dcb9' },
+    [SupportedAssets.EURS]: { 5: '0xBC33cfbD55EA6e5B97C6da26F11160ae82216E2b' },
 }
 
 const addressesAaveStableDebtTokensGoerli: { [key: string]: { [chainId: number]: string } } = {
-    [SupportedAssets.WETH]: { 5: '0xCAF956bD3B3113Db89C0584Ef3B562153faB87D5' },
-    [SupportedAssets.DAI]: { 5: '0xbaBd1C3912713d598CA2E6DE3303fC59b19d0B0F' },
-    [SupportedAssets.LINK]: { 5: '0x4f094AB301C8787F0d06753CA3238bfA9CFB9c91' },
-    [SupportedAssets.USDC]: { 5: '0xF04958AeA8b7F24Db19772f84d7c2aC801D9Cf8b' },
-    [SupportedAssets.WBTC]: { 5: '0x15FF4188463c69FD18Ea39F68A0C9B730E23dE81' },
-    [SupportedAssets.USDT]: { 5: '0x7720C270Fa5d8234f0DFfd2523C64FdeB333Fa50' },
-    [SupportedAssets.AAVE]: { 5: '0x4a8aF512B73Fd896C8877cE0Ebed19b0a11B593C' },
-    [SupportedAssets.EURS]: { 5: '0x512ad2D2fb3Bef82ca0A15d4dE6544246e2D32c7' },
+    [SupportedAssets.WETH]: { 5: '0xaf082611873a9b99E5e3A7C5Bea3bdb93AfA044C' },
+    [SupportedAssets.DAI]: { 5: '0xF918faA5A5Ab892DbEa5D15Ef4a4F846f8826AA5' },
+    [SupportedAssets.LINK]: { 5: '0xc810906266Fcfca25CC8E41CAc029cdCF3687611' },
+    [SupportedAssets.USDC]: { 5: '0x4A1504b9E88DFF2651dD0E18eF7b8A1bc41f182E' },
+    [SupportedAssets.WBTC]: { 5: '0x87448E7219E0a0D8E226Ae61120110590366Be33' },
+    [SupportedAssets.USDT]: { 5: '0x5Da3eF536274B97f88AAB30a54f0cC7604E347f3' },
+    [SupportedAssets.AAVE]: { 5: '0x54Ecb7FAfe1c30906B7d0c6b1C5f0f3941072bfe' },
+    [SupportedAssets.EURS]: { 5: '0xf4874d1d69E07aDdB8807150ba33AC4d59C8dA3f' },
 }
 
 const addressesAaveATokensGoerli: { [key: string]: { [chainId: number]: string } } = {
-    [SupportedAssets.WETH]: { 5: '0x27B4692C93959048833f40702b22FE3578E77759' },
-    [SupportedAssets.DAI]: { 5: '0x310839bE20Fc6a8A89f33A59C7D5fC651365068f' },
-    [SupportedAssets.LINK]: { 5: '0x6A639d29454287B3cBB632Aa9f93bfB89E3fd18f' },
-    [SupportedAssets.USDC]: { 5: '0x1Ee669290939f8a8864497Af3BC83728715265FF' },
-    [SupportedAssets.WBTC]: { 5: '0xc0ac343EA11A8D05AAC3c5186850A659dD40B81B' },
-    [SupportedAssets.USDT]: { 5: '0x73258E6fb96ecAc8a979826d503B45803a382d68' },
-    [SupportedAssets.AAVE]: { 5: '0xC4bf7684e627ee069e9873B70dD0a8a1241bf72c' },
-    [SupportedAssets.EURS]: { 5: '0xc31E63CB07209DFD2c7Edb3FB385331be2a17209' },
+    [SupportedAssets.WETH]: { 5: '0x7649e0d153752c556b8b23DB1f1D3d42993E83a5' },
+    [SupportedAssets.DAI]: { 5: '0xADD98B0342e4094Ec32f3b67Ccfd3242C876ff7a' },
+    [SupportedAssets.LINK]: { 5: '0x493DC51c35F7ddD891262b8733C63eABaf14786f' },
+    [SupportedAssets.USDC]: { 5: '0x8Be59D90A7Dc679C5cE5a7963cD1082dAB499918' },
+    [SupportedAssets.WBTC]: { 5: '0x005B0d11379c4c04C0B726eE0BE55feb50b59f81' },
+    [SupportedAssets.USDT]: { 5: '0xf3368D1383cE079006E5D1d56878b92bbf08F1c2' },
+    [SupportedAssets.AAVE]: { 5: '0xB7a80Aff22D3dA5dbfd109f33D8305A34A696D1c' },
+    [SupportedAssets.EURS]: { 5: '0x5a6Ba5e8e7091F64D4bb6729830E5EAf00Bb943d' },
 }
 
 const addressesAaveVariableDebtTokens: { [key: string]: { [chainId: number]: string } } = {
-    [SupportedAssets.WETH]: { 5: '0x2b848bA14583fA79519Ee71E7038D0d1061cd0F1' },
-    [SupportedAssets.DAI]: { 5: '0xEa5A7CB3BDF6b2A8541bd50aFF270453F1505A72' },
-    [SupportedAssets.LINK]: { 5: '0x593D1bB0b6052FB6c3423C42FA62275b3D95a943' },
-    [SupportedAssets.USDC]: { 5: '0x3e491EB1A98cD42F9BBa388076Fd7a74B3470CA0' },
-    [SupportedAssets.WBTC]: { 5: '0x480B8b39d1465b8049fbf03b8E0a072Ab7C9A422' },
-    [SupportedAssets.USDT]: { 5: '0x45c3965f6FAbf2fB04e3FE019853813B2B7cC3A3' },
-    [SupportedAssets.AAVE]: { 5: '0xad958444c255a71C659f7c30e18AFafdE910EB5a' },
-    [SupportedAssets.EURS]: { 5: '0x257b4a23b3026E04790c39fD3Edd7101E5F31192' },
+    [SupportedAssets.WETH]: { 5: '0xff3284Be0C687C21cCB18a8e61a27AeC72C520bc' },
+    [SupportedAssets.DAI]: { 5: '0xEAEc6590FDA7981b7DE06Bae7C1De27cFc262818' },
+    [SupportedAssets.LINK]: { 5: '0x76a79F46329a8EB7d7d1c50F45a4090707588864' },
+    [SupportedAssets.USDC]: { 5: '0x4DAe67e69aCed5ca8f99018246e6476F82eBF9ab' },
+    [SupportedAssets.WBTC]: { 5: '0xB2353aB4dcbEBa08EB7Ea0F098E90aEC41008BB5' },
+    [SupportedAssets.USDT]: { 5: '0xF2C9Aa2B0Fc747fC0327B335541FD34D180f8A30' },
+    [SupportedAssets.AAVE]: { 5: '0x1ef9ae399F3C4738677A9BfC5d561765392dd333' },
+    [SupportedAssets.EURS]: { 5: '0x166C9CbE2E31Ae3C26cE4C18278BF5dbED82484C' },
 }
 
+
+const usedMaxFeePerGas = parseUnits('200', 9)
+const usedMaxPriorityFeePerGas = parseUnits('20', 9)
+
+const opts = {
+    maxFeePerGas: usedMaxFeePerGas,
+    maxPriorityFeePerGas: usedMaxPriorityFeePerGas
+}
+
+const addresses = brokerAddresses as any
+
 async function main() {
-    const diamondAddress = '0x41E9a4801D7AE2f032cF37Bf262339Eddd00a06c'
+
+
     const accounts = await ethers.getSigners()
     const operator = accounts[0]
     const chainId = await operator.getChainId();
+
+    const proxyAddress = addresses.BrokerProxy[chainId]
+    const minimalRouter = addresses.minimalRouter[chainId]
+
+    validateAddresses([proxyAddress, minimalRouter])
+
     console.log("Operate on", chainId, "by", operator.address)
 
     // deploy ConfigModule
-    const management = await new ManagementModule__factory(operator).attach(diamondAddress)
+    const management = await new ManagementModule__factory(operator).attach(proxyAddress)
 
-    // await management.setUniswapRouter('0x2E5134f3Af641C8A9B8B0893023a19d47699ECD1')
+    let tx = await management.setUniswapRouter(minimalRouter, opts)
+    await tx.wait()
 
     const underlyingAddresses = Object.values(addressesAaveTokensGoerli).map(t => t[chainId])
     console.log("Assets", underlyingAddresses)
 
-    // console.log("approve router")
-    // await management.approveRouter(underlyingAddresses)
-    // await delay(10000)
-    // console.log("approve aave pool")
-    // await management.approveAAVEPool(underlyingAddresses)
-    // await delay(13000)
+    console.log("approve router")
+    tx = await management.approveRouter(underlyingAddresses, opts)
+    await tx.wait()
+    console.log("approve aave pool")
+    tx = await management.approveAAVEPool(underlyingAddresses, opts)
+    await tx.wait()
 
     for (let k of Object.keys(addressesAaveATokensGoerli)) {
         console.log("add aave tokens a", k)
-        await management.addAToken(addressesAaveTokensGoerli[k][chainId], addressesAaveATokensGoerli[k][chainId])
-        await delay(13000)
-        // console.log("add aave tokens s", k)
-        // await management.addSToken(addressesAaveTokensGoerli[k][chainId], addressesAaveStableDebtTokensGoerli[k][chainId])
-        // await delay(10000)
-        // console.log("add aave tokens v", k)
-        // await management.addVToken(addressesAaveTokensGoerli[k][chainId], addressesAaveVariableDebtTokens[k][chainId])
-        // await delay(10000)
-        // console.log("add aave tokens base", k)
+        tx = await management.addAToken(addressesAaveTokensGoerli[k][chainId], addressesAaveATokensGoerli[k][chainId], opts)
+        await tx.wait()
+        console.log("add aave tokens s", k)
+        tx = await management.addSToken(addressesAaveTokensGoerli[k][chainId], addressesAaveStableDebtTokensGoerli[k][chainId], opts)
+        await tx.wait()
+        console.log("add aave tokens v", k)
+        tx = await management.addVToken(addressesAaveTokensGoerli[k][chainId], addressesAaveVariableDebtTokens[k][chainId], opts)
+        await tx.wait()
+        console.log("add aave tokens base", k)
 
     }
 }
